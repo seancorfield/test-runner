@@ -55,9 +55,8 @@
 
 (defn- contains-tests?
   "Check if a namespace contains some tests to be executed."
-  [ns]
-  (some (comp :test meta)
-        (-> ns ns-publics vals)))
+  [pred ns]
+  (some pred (-> ns ns-publics vals)))
 
 (defn test
   [options]
@@ -66,12 +65,23 @@
         nses (->> dirs
                   (map io/file)
                   (mapcat find/find-namespaces-in-dir))
-        nses (filter (ns-filter options) nses)]
+        nses (filter (ns-filter options) nses)
+        lazy-find (try (requiring-resolve 'lazytest.find/find-var-test-value)
+                       (catch Exception _ nil))
+        lazy-run
+        (try (requiring-resolve 'lazytest.repl/run-tests)
+             (catch Exception _ nil))]
     (println (format "\nRunning tests in %s" dirs))
     (dorun (map require nses))
     (try
       (filter-vars! nses (var-filter options))
-      (apply test/run-tests (filter contains-tests? nses))
+      (cond->> {:fail 0 :error 0}
+        :clojure.test
+        (merge-with + (when-let [nses-with-tests (seq (filter #(contains-tests? (comp :test meta) %) nses))]
+                        (apply test/run-tests nses-with-tests)))
+        (and lazy-find lazy-run)
+        (merge-with + (when-let [nses-with-tests (seq (filter #(contains-tests? lazy-find %) nses))]
+                        (apply lazy-run nses-with-tests))))
       (finally
         (restore-vars! nses)))))
 

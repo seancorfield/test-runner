@@ -4,3 +4,7 @@
 .idea/
 *.iml
 .nrepl-port
+.calva/repl.calva-repl
+.clj-kondo/.cache/
+.lsp/.cache/
+.portal/vs-code.edn
