@@ -70,6 +70,9 @@
                        (catch Exception _ nil))
         lazy-run
         (try (requiring-resolve 'lazytest.repl/run-tests)
+             (catch Exception _ nil))
+        lazy-reporters
+        (try @(requiring-resolve 'lazytest.reporters/nested)
              (catch Exception _ nil))]
     (println (format "\nRunning tests in %s" dirs))
     (dorun (map require nses))
@@ -81,7 +84,7 @@
                         (apply test/run-tests nses-with-tests)))
         (and lazy-find lazy-run)
         (merge-with + (when-let [nses-with-tests (seq (filter #(contains-tests? lazy-find %) nses))]
-                        (apply lazy-run nses-with-tests))))
+                        (lazy-run nses-with-tests {:reporters [lazy-reporters]}))))
       (finally
         (restore-vars! nses)))))
 
