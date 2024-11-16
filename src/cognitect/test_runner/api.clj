@@ -4,13 +4,21 @@
     [cognitect.test-runner :as tr]))
 
 (defn- do-test
-  [{:keys [dirs nses patterns vars includes excludes]}]
+  [{:keys [dirs nses patterns vars includes excludes output]}]
   (let [adapted {:dir (when (seq dirs) (set dirs))
                  :namespace (when (seq nses) (set nses))
                  :namespace-regex (when (seq patterns) (map re-pattern patterns))
                  :var (when (seq vars) (set vars))
                  :include (when (seq includes) (set includes))
-                 :exclude (when (seq excludes) (set excludes))}]
+                 :exclude (when (seq excludes) (set excludes))
+                 :output (let [output (if (and output (symbol? output)) [output] output)]
+                              (-> (mapv #(if (qualified-symbol? %)
+                                           %
+                                           (symbol "lazytest.reporters"
+                                                   (name %)))
+                                        output)
+                                  (not-empty)
+                                  (or ['lazytest.reporters/nested])))}]
     (tr/test adapted)))
 
 (defn test
