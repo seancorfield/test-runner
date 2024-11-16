@@ -1,5 +1,6 @@
 (ns cognitect.test-runner
-  (:require [clojure.tools.namespace.find :as find]
+  (:require [clojure.set :as set]
+            [clojure.tools.namespace.find :as find]
             [clojure.java.io :as io]
             [clojure.test :as test]
             [clojure.tools.cli :as cli])
@@ -73,7 +74,8 @@
              (catch Exception _ nil))
         lazy-reporters
         (try @(requiring-resolve 'lazytest.reporters/nested)
-             (catch Exception _ nil))]
+             (catch Exception _ nil))
+        lazy-opts {:var :var-filter :namespace :ns-filter :output :reporter}]
     (println (format "\nRunning tests in %s" dirs))
     (dorun (map require nses))
     (try
@@ -84,7 +86,9 @@
                         (apply test/run-tests nses-with-tests)))
         (and lazy-find lazy-run)
         (merge-with + (when-let [nses-with-tests (seq (filter #(contains-tests? lazy-find %) nses))]
-                        (lazy-run nses-with-tests {:reporters [lazy-reporters]}))))
+                        (lazy-run nses-with-tests
+                                  (merge {:reporter [lazy-reporters]}
+                                         (set/rename-keys options lazy-opts))))))
       (finally
         (restore-vars! nses)))))
 
@@ -103,7 +107,7 @@
    ["-n" "--namespace SYMBOL" "Symbol indicating a specific namespace to test."
     :parse-fn symbol
     :assoc-fn accumulate]
-   ["-r" "--namespace-regex REGEX" "Regex for namespaces to test."
+   ["-r" "--namespace-regex REGEX" "Regex for namespaces to test (clojure.test-only)."
     :parse-fn re-pattern
     :assoc-fn accumulate]
    ["-v" "--var SYMBOL" "Symbol indicating the fully qualified name of a specific test."
@@ -115,6 +119,13 @@
    ["-e" "--exclude KEYWORD" "Exclude tests with this metadata keyword."
     :parse-fn parse-kw
     :assoc-fn accumulate]
+   [nil "--output SYMBOL" "Output format (LazyTest-only). Can be given multiple times. (Defaults to \"nested\".)"
+    :parse-fn read-string
+    :assoc-fn (fn [args k v]
+                (let [output (if (qualified-symbol? v)
+                               v
+                               (symbol "lazytest.reporters" (name v)))]
+                  (update args k (comp vec distinct (fnil conj [])) output)))]
    ["-H" "--test-help" "Display this help message"]])
 
 (defn- help
