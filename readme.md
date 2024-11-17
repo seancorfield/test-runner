@@ -4,6 +4,13 @@
 projects using native Clojure deps (i.e, those that use only Clojure's
 built-in dependency tooling, not Leiningen/boot/etc.)
 
+This fork -- `seancorfield` -- allows the `test-runner` to be used with
+codebases that contain both `clojure.test`-compatible tests (including
+[Expectations](https://github.com/clojure-expectations/clojure-test))
+and [Lazytest](https://github.com/NoahTheDuke/lazytest) tests. It requires
+at least Clojure 1.10.0. If you are using LazyTest, you will need to add
+it as a dependency in your `deps.edn` file, in addition to `test-runner`.
+
 ## Rationale
 
 Clojure's 1.9 release included standalone tools for dependency
@@ -23,16 +30,15 @@ easy-to-use entry point for discovering and running unit and
 property-based tests while remaining a lightweight entry in Clojure's
 suite of decomplected project management tools.
 
-## Configuration 
+## Configuration
 
 Include a dependency on this project in your `deps.edn`. You will
 probably wish to put it in the `test` alias:
 
 ```clojure
-;; v0.5.1
 :aliases {:test {:extra-paths ["test"]
-                 :extra-deps {io.github.cognitect-labs/test-runner 
-                              {:git/tag "v0.5.1" :git/sha "dfb30dd"}}
+                 :extra-deps {io.github.seancorfield/test-runner
+                              {:git/sha "a97ea6c47da400bcf72306edecff00762270e0f2"}}
                  :main-opts ["-m" "cognitect.test-runner"]
                  :exec-fn cognitect.test-runner.api/test}}
 ```
@@ -56,10 +62,11 @@ You may also supply any of the additional command line options:
 ```
   :dirs - coll of directories containing tests, default= ["test"]
   :nses - coll of namespace symbols to test
-  :patterns - coll of regex strings to match namespaces
+  :patterns - coll of regex strings to match namespaces (clojure.test-only)
   :vars - coll of fully qualified symbols to run tests on
   :includes - coll of test metadata keywords to include
-  :excludes - coll of test metadata keywords to exclude"
+  :excludes - coll of test metadata keywords to exclude
+  :outputs - coll of LazyTest-only output reporters to use
 ```
 
 If neither :dirs or :nses is supplied, will use:
@@ -89,9 +96,11 @@ Use any of the additional command line options:
   -n, --namespace SYMBOL       Symbol indicating a specific namespace to test.
   -r, --namespace-regex REGEX  Regex for namespaces to test. Defaults to #".*-test$"
                                (i.e, only namespaces ending in '-test' are evaluated)
+                               (clojure.test-only)
   -v, --var SYMBOL             Symbol indicating the fully qualified name of a specific test.
   -i, --include KEYWORD        Run only tests that have this metadata keyword.
   -e, --exclude KEYWORD        Exclude tests with this metadata keyword.
+      --output SYMBOL          Output format (LazyTest-only). Can be given multiple times. (Defaults to nested.)
   -H, --test-help              Display this help message
 ```
 
@@ -132,6 +141,6 @@ If both inclusions and exclusions are present, exclusions take priority over inc
 
 ## Copyright and License
 
-Copyright © 2018-2022 Cognitect
+Copyright © 2018-2024 Cognitect
 
 Licensed under the Eclipse Public License, Version 2.0
