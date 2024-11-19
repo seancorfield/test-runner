@@ -11,7 +11,7 @@
                  :var (when (seq vars) (set vars))
                  :include (when (seq includes) (set includes))
                  :exclude (when (seq excludes) (set excludes))
-                 :output (or (not-empty outputs) ['lazytest.reporters/nested])}]
+                 :output outputs}]
     (tr/test adapted)))
 
 (defn test

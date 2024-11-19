@@ -84,8 +84,7 @@
         (and lazy-find lazy-run)
         (merge-with + (when-let [nses-with-tests (seq (filter #(contains-tests? lazy-find %) nses))]
                         (lazy-run nses-with-tests
-                                  (merge {:output ['lazytest.reporters/nested]}
-                                         (set/rename-keys options lazy-opts))))))
+                                  (set/rename-keys options lazy-opts)))))
       (finally
         (restore-vars! nses)))))
 
@@ -117,12 +116,8 @@
     :parse-fn parse-kw
     :assoc-fn accumulate]
    [nil "--output SYMBOL" "Output format (LazyTest-only). Can be given multiple times. (Defaults to \"nested\".)"
-    :parse-fn read-string
-    :assoc-fn (fn [args k v]
-                (let [output (if (qualified-symbol? v)
-                               v
-                               (symbol "lazytest.reporters" (name v)))]
-                  (update args k (comp vec distinct (fnil conj [])) output)))]
+    :parse-fn symbol
+    :assoc-fn (fn [m k v] (update m k (fnil conj []) v))]
    ["-H" "--test-help" "Display this help message"]])
 
 (defn- help
