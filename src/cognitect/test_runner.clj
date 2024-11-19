@@ -72,10 +72,7 @@
         lazy-run
         (try (requiring-resolve 'lazytest.repl/run-tests)
              (catch Exception _ nil))
-        lazy-reporters
-        (try @(requiring-resolve 'lazytest.reporters/nested)
-             (catch Exception _ nil))
-        lazy-opts {:var :var-filter :namespace :ns-filter :output :reporter}]
+        lazy-opts {:var :var-filter :namespace :ns-filter}]
     (println (format "\nRunning tests in %s" dirs))
     (dorun (map require nses))
     (try
@@ -87,7 +84,7 @@
         (and lazy-find lazy-run)
         (merge-with + (when-let [nses-with-tests (seq (filter #(contains-tests? lazy-find %) nses))]
                         (lazy-run nses-with-tests
-                                  (merge {:reporter [lazy-reporters]}
+                                  (merge {:output ['lazytest.reporters/nested]}
                                          (set/rename-keys options lazy-opts))))))
       (finally
         (restore-vars! nses)))))
