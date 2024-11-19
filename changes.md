@@ -3,7 +3,7 @@ Changelog
 
 These versions are from `io.github.seancorfield/test-runner`:
 
-* v0.6.0 in progress
+* v0.6.0 d5f18c5 -- 2024-11-19
   * Add support for [lazytest](https://github.com/noahtheduke/lazytest).
 
 Previous versions are from Cognitect, as `io.github.cognitect-labs/test-runner`:
