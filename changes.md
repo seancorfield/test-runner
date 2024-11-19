@@ -1,6 +1,8 @@
 Changelog
 ===========
 
+* v0.6.0 in progress
+  * Add support for [lazytest](https://github.com/noahtheduke/lazytest).
 * v0.5.1 - May 6, 2022
   * Bump deps to latest
 * v0.5.0 - Sept 3, 2021
@@ -20,4 +22,3 @@ Changelog
   * Add #17 - skip fixtures if no vars from test ns are being run
   * Add #28 - add entry point for -X style invocation
   * Bump deps to latest + clojure 1.9.0
-
