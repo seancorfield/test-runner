@@ -11,13 +11,7 @@
                  :var (when (seq vars) (set vars))
                  :include (when (seq includes) (set includes))
                  :exclude (when (seq excludes) (set excludes))
-                 :output (-> (mapv #(if (qualified-symbol? %)
-                                      %
-                                      (symbol "lazytest.reporters"
-                                              (name %)))
-                                   outputs)
-                             (not-empty)
-                             (or ['lazytest.reporters/nested]))}]
+                 :output (or (not-empty outputs) ['lazytest.reporters/nested])}]
     (tr/test adapted)))
 
 (defn test
