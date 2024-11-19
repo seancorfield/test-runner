@@ -13,22 +13,8 @@ it as a dependency in your `deps.edn` file, in addition to `test-runner`.
 
 ## Rationale
 
-Clojure's 1.9 release included standalone tools for dependency
-resolution, classpath construction, and launching processes. Clojure
-also ships with a straightforward testing library, `clojure.test`.
-
-Using these tools, however, there was no standard way to
-discover and run unit tests. Including a heavyweight project tool such
-as Leiningen or Boot just for the purpose of testing is
-overkill. Projects can build their own ad-hoc test runners, but these
-tend to lack features that will eventually be desired, and tend
-towards the "quick and dirty," besides being nonstandard from project
-to project.
-
-This library aims to fill in the gap and provide a standardized,
-easy-to-use entry point for discovering and running unit and
-property-based tests while remaining a lightweight entry in Clojure's
-suite of decomplected project management tools.
+See [Cognitect's original README](https://github.com/cognitect-labs/test-runner#rationale)
+for the Rationale, based on tooling introduced with Clojure 1.9.0.
 
 ## Configuration
 
@@ -38,9 +24,16 @@ probably wish to put it in the `test` alias:
 ```clojure
 :aliases {:test {:extra-paths ["test"]
                  :extra-deps {io.github.seancorfield/test-runner
-                              {:git/sha "a97ea6c47da400bcf72306edecff00762270e0f2"}}
+                              {:git/sha "dcfee5f73343704772d5c5206e815f517a6fddc8"}}
                  :main-opts ["-m" "cognitect.test-runner"]
                  :exec-fn cognitect.test-runner.api/test}}
+```
+
+If you are using LazyTest, you will need to include it as a dependency
+(in `:extra-deps`) as well (1.4.0 or later):
+
+```clojure
+                              io.github.noahtheduke/lazytest {:mvn/version "1.4.0"}
 ```
 
 ### Invoke with `clojure -X` (exec style)
@@ -141,6 +134,6 @@ If both inclusions and exclusions are present, exclusions take priority over inc
 
 ## Copyright and License
 
-Copyright © 2018-2024 Cognitect
+Copyright © 2018-2024 Cognitect, LazyTest integration © 2024 Sean Corfield
 
 Licensed under the Eclipse Public License, Version 2.0
