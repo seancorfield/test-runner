@@ -68,7 +68,9 @@
     (filter-vars! nses (var-filter options)))
   (contains-tests? [_ _ ns] (ns-contains-tests? ns))
   (run-tests [this options nses]
-    (if-let [outputs (seq (:output options))]
+    ;; we only care about junit and tap (other test runners might care about
+    ;; other values)
+    (if-let [outputs (seq (filter #{'junit 'tap} (:output options)))]
       (doseq [output outputs]
         (case output
           junit
@@ -76,9 +78,7 @@
             (apply test/run-tests (filter #(p/contains-tests? this options %) nses)))
           tap
           (tap/with-tap-output
-            (apply test/run-tests (filter #(p/contains-tests? this options %) nses)))
-          ;; otherwise just run it as-is:
-          (apply test/run-tests (filter #(p/contains-tests? this options %) nses))))
+            (apply test/run-tests (filter #(p/contains-tests? this options %) nses)))))
       (apply test/run-tests (filter #(p/contains-tests? this options %) nses))))
   (disable-filtering! [_ _ nses]
     (restore-vars! nses)))
