@@ -77,9 +77,8 @@
           tap
           (tap/with-tap-output
             (apply test/run-tests (filter #(p/contains-tests? this options %) nses)))
-          default
-          (apply test/run-tests (filter #(p/contains-tests? this options %) nses))
-          (throw (ex-info (str "Unknown output format for clojure.test: " output) {}))))
+          ;; otherwise just run it as-is:
+          (apply test/run-tests (filter #(p/contains-tests? this options %) nses))))
       (apply test/run-tests (filter #(p/contains-tests? this options %) nses))))
   (disable-filtering! [_ _ nses]
     (restore-vars! nses)))
